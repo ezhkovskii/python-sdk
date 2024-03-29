@@ -25,7 +25,7 @@ https://github.com/FISCO-BCOS/python-sdk
       ```
 - В файле datatype_parser.py 
   - в методе parse_output используется get_fn_abi_types вместо get_fn_abi_types_single, а также decode_abi вместо decode_single
-
+  - добавлен @staticmethod для parse_error_msg
 
 
 
