@@ -54,7 +54,7 @@ from .abi import (
     get_abi_input_names,
     get_indexed_event_inputs,
     map_abi_data,
-    normalize_event_input_types,
+    normalize_event_input_types, get_normalized_abi_arg_type,
 )
 
 
@@ -152,8 +152,7 @@ def get_event_abi_types_for_decoding(event_inputs):
         if input_abi['indexed'] and is_dynamic_sized_type(input_abi['type']):
             yield 'bytes32'
         else:
-            yield input_abi['type']
-
+            yield get_normalized_abi_arg_type(input_abi)
 
 @curry
 def get_event_data(event_abi, log_entry):
@@ -363,9 +362,11 @@ def _build_argument_filters_from_event_abi(event_abi):
     for item in event_abi['inputs']:
         key = item['name']
         if item['indexed'] is True:
-            value = TopicArgumentFilter(arg_type=item['type'])
+            value = TopicArgumentFilter(
+                arg_type=get_normalized_abi_arg_type(item)
+            )
         else:
-            value = DataArgumentFilter(arg_type=item['type'])
+            value = DataArgumentFilter(arg_type=get_normalized_abi_arg_type(item))
         yield key, value
 
 
@@ -410,7 +411,7 @@ class BaseArgumentFilter(ABC):
 class DataArgumentFilter(BaseArgumentFilter):
     @property
     def match_values(self):
-        return (self.arg_type, self._match_values)
+        return self.arg_type, self._match_values
 
 
 class TopicArgumentFilter(BaseArgumentFilter):

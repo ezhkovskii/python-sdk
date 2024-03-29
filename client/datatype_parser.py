@@ -29,7 +29,7 @@ from utils.abi import (
     filter_by_type,
     abi_to_signature,
     get_fn_abi_types_single,
-    exclude_indexed_event_inputs_to_single, exclude_indexed_event_inputs_to_abi, get_constructor_abi)
+    exclude_indexed_event_inputs_to_single, exclude_indexed_event_inputs_to_abi, get_constructor_abi, get_fn_abi_types)
 from utils.contracts import encode_transaction_data
 
 
@@ -151,9 +151,12 @@ class DatatypeParser:
         if name not in self.func_abi_map_by_name:
             return None
         func_abi = self.func_abi_map_by_name[name]
-        output_args = get_fn_abi_types_single(func_abi, "outputs")
+        #output_args = get_fn_abi_types_single(func_abi, "outputs")
+        output_args = get_fn_abi_types(func_abi, "outputs")
         # print(output_args)
-        result = decode_single(output_args, decode_hex(outputdata))
+        # if outputdata == '0x':
+        #     return None
+        result = decode_abi(output_args, decode_hex(outputdata)) #b'\x00' + decode_hex(outputdata)[4:])
         return result
 
     # 用于receipt，解析合约接口的返回值

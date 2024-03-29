@@ -701,6 +701,15 @@ class ABITypedData(namedtuple('ABITypedData', 'abi_type, data')):
         return super().__new__(cls, *iterable)
 
 
+def get_normalized_abi_arg_type(abi_arg) -> str:
+    """
+    Return the normalized type for the abi argument provided. In order to account for tuple argument
+    types, this abstraction makes use of `collapse_if_tuple()` to collapse the appropriate component
+    types within a tuple type, if present.
+    """
+    return collapse_if_tuple(dict(abi_arg))
+
+
 def abi_sub_tree(type_str_or_abi_type: Optional[Union[TypeStr, ABIType]],
                  data_value: Any) -> ABITypedData:
     if type_str_or_abi_type is None:

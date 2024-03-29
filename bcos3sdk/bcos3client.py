@@ -55,7 +55,8 @@ class Bcos3Client:
     sdk_version = None
     request_counter = itertools.count()
     
-    def __init__(self, client_config_instance=client_config):
+    def __init__(self, current_account: str = None, client_config_instance=client_config):
+        self.current_account = current_account
         self.lastblocklimittime = 0
         self.init(client_config_instance)
     
@@ -114,7 +115,7 @@ class Bcos3Client:
     
     def init_clib_sdk(self):
         self.seq = 0
-        self.bcossdk = NativeBcos3sdk()
+        self.bcossdk = NativeBcos3sdk(self.config.bcos3_config_file, self.config.bcos3_lib_path)
         self.load_default_account()
         # print("init_sdk: {self.config.bcos3lib_config_file}")
         res = self.bcossdk.init_sdk(self.config.bcos3_config_file, self.config.bcos3_lib_path)
@@ -152,8 +153,9 @@ class Bcos3Client:
         # 默认的 ecdsa 账号
         
         if self.config.crypto_type == CRYPTO_TYPE_ECDSA:
+            acc = self.current_account if self.current_account else self.config.account_keyfile
             self.account_file = "{}/{}".format(self.config.account_keyfile_path,
-                                               self.config.account_keyfile)
+                                               acc)
             
             self.default_from_account_signer = Signer_ECDSA.from_key_file(
                 self.account_file, self.config.account_password)
